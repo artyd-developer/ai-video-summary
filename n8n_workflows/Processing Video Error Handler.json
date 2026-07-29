@@ -1,0 +1,78 @@
+{
+  "name": "Processing Video Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        64
+      ],
+      "id": "3b9edea7-c6f7-4e38-8949-bba9aba62a9f",
+      "name": "Error Handler"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $env.TELEGRAM_CHAT_ID }}",
+        "text": "=🚨 <b>WORKFLOW ERROR</b> 🚨\n\n<b>Failed node:</b> \n{{$json.error_node}}\n\n<b>Error message:</b>\n<code>{{$json.error_message}}</code>",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        160
+      ],
+      "id": "7b32312d-3002-4ac1-b52a-e3d4ed1f971c",
+      "name": "Send Error Message",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE videos\nSET \n    status = 'error',\n    message = LEFT('{{ $json.error.message }}', 127)\nWHERE id = (\n    SELECT el.video_id \n    FROM execution_logs el \n    WHERE el.run_id = '{{ $json.execution.id }}'\n)",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "9e9b8231-06c9-41c9-9401-84dc3ceb410a",
+      "name": "Set Video Error Status"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Set Video Error Status",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {},
+  "nodeGroups": [],
+  "id": "CTimCNL6YiLcloaX",
+  "tags": []
+}

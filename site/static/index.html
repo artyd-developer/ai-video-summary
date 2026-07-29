@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Hub</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #1e293b; color: #e2e8f0; font-family: system-ui, sans-serif; }
+        .nav-btn.active { background: #334155; color: #818cf8; border-left: 4px solid #818cf8; }
+        .page { display: none; }
+        .page.active { display: block; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+									
+    <div class="w-64 bg-slate-900 p-4 flex flex-col gap-2">
+        <h1 class="text-xl font-bold mb-8 text-indigo-400 px-2">🎥 AI Video Hub</h1>
+        <button onclick="showPage('upload')" class="nav-btn active text-left p-3 rounded-lg hover:bg-slate-800 transition" id="btn-upload">
+            ⬆️ Upload Video
+        </button>
+        <button onclick="showPage('status')" class="nav-btn text-left p-3 rounded-lg hover:bg-slate-800 transition" id="btn-status">
+            📊 Processing Status
+        </button>
+    </div>
+
+											
+    <div class="flex-1 p-8 overflow-y-auto">
+
+													 
+        <div id="page-upload" class="page active max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold mb-2">Upload Video</h2>
+            <p class="text-slate-400 mb-6">Your video will be processed, and the result will be sent to Telegram.</p>
+
+            <div class="border-2 border-dashed border-slate-600 rounded-xl p-12 text-center hover:border-indigo-500 transition cursor-pointer" id="drop-zone">
+                <div class="text-5xl mb-4">📁</div>
+                <p class="text-slate-400">Click or drag a video file here</p>
+																											  
+                <input type="file" id="file-input" accept="video/*" class="hidden">
+                <p id="file-name-display" class="text-indigo-400 mt-2 hidden"></p>
+            </div>
+
+            <button id="submit-btn" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Submit for Analysis
+            </button>
+
+            <div id="upload-result" class="mt-4 p-4 rounded-xl hidden"></div>
+        </div>
+
+												   
+        <div id="page-status" class="page">
+            <h2 class="text-2xl font-bold mb-6">Last 10 Videos</h2>
+            <div class="bg-slate-800 rounded-xl overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900">
+                        <tr>
+                            <th class="p-4 text-slate-400 font-medium">File Name</th>
+                            <th class="p-4 text-slate-400 font-medium">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videos-table" hx-get="/api/videos/list" hx-trigger="load, every 5s">
+                        <tr><td colspan="2" class="p-4 text-center text-slate-500">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+									 
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`page-${pageId}`).classList.add('active');
+            document.getElementById(`btn-${pageId}`).classList.add('active');
+        }
+
+												
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const submitBtn = document.getElementById('submit-btn');
+        const uploadResult = document.getElementById('upload-result');
+
+        let selectedFile = null;
+
+															  
+        dropZone.addEventListener('click', () => fileInput.click());
+
+									 
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-indigo-500', 'bg-slate-800');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-indigo-500', 'bg-slate-800');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-indigo-500', 'bg-slate-800');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+																
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+															  
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('video/')) {
+                alert('Please select a video file.');
+                return;
+            }
+
+            selectedFile = file;
+            fileNameDisplay.textContent = "Selected: " + file.name;
+            fileNameDisplay.classList.remove('hidden');
+            submitBtn.disabled = false;
+            uploadResult.classList.add('hidden');
+        }
+
+											
+        submitBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            const formData = new FormData();
+            formData.append('video', selectedFile);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    uploadResult.innerHTML = "✅ " + data.message;
+                    uploadResult.className = "mt-4 p-4 rounded-xl bg-green-900/30 border border-green-700 text-green-300";
+                } else {
+                    uploadResult.innerHTML = "❌ Error: " + (data.detail || JSON.stringify(data));
+                    uploadResult.className = "mt-4 p-4 rounded-xl bg-red-900/30 border border-red-700 text-red-300";
+                }
+
+                uploadResult.classList.remove('hidden');
+
+            } catch (err) {
+                let errorText = "Network error or server is unavailable.";
+
+                if (err.message) {
+                    errorText = err.message;
+                }
+
+                try {
+																																	
+                    const errorData = await err.json();
+                    errorText = JSON.stringify(errorData);
+                } catch (e) {
+                    if (err.statusText) {
+                        errorText = err.statusText;
+                    }
+                }
+
+                uploadResult.innerHTML = "❌ Error: " + errorText;
+                uploadResult.className = "mt-4 p-4 rounded-xl bg-red-900/30 border border-red-700 text-red-300 break-all";
+                uploadResult.classList.remove('hidden');
+
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit for Analysis';
+                selectedFile = null;
+                fileInput.value = '';
+                fileNameDisplay.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
