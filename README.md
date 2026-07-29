@@ -4,6 +4,12 @@ Automated video processing platform based on **n8n + FastAPI + PostgreSQL + Whis
 
 Currently, the project provides a complete pipeline for uploading videos, extracting audio, transcribing speech using Whisper, storing processing states, and sending reports through a Telegram bot.
 
+<img width="606" height="288" alt="hub1" src="https://github.com/user-attachments/assets/ee544494-b1ef-4d47-b655-1fbc55db4a44" />
+<img width="606" height="288" alt="hub2" src="https://github.com/user-attachments/assets/18d101a4-6e7b-4963-b367-afe559076a44" />
+<img width="445" height="433" alt="hub3" src="https://github.com/user-attachments/assets/48c2d5ae-6ac2-42ac-9e34-f259d562702e" />
+
+
+
 ---
 
 # Features
@@ -19,7 +25,9 @@ Currently, the project provides a complete pipeline for uploading videos, extrac
 
 # Architecture
 
-[]
+<img width="1230" height="722" alt="hub4" src="https://github.com/user-attachments/assets/07f46fa0-ca28-464d-b1c8-4a3b416fe5a6" />
+
+
 
 ---
 
