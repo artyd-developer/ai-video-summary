@@ -1,3 +1,5 @@
+[English](README.md) | [Русский](README.ru.md)
+
 # AI Video Summary
 
 Автоматизированная платформа обработки видео на базе **n8n + FastAPI + PostgreSQL + Whisper**.
