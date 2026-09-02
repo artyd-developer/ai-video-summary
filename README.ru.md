@@ -41,6 +41,7 @@ n8n_workflows/
 ├── Players Activity Report.json  
 └── Processing Video Error Handler.json
 
+<img width="1440" height="900" alt="scheme" src="https://github.com/user-attachments/assets/36e825b6-4291-442c-86bd-8a4d6e07909c" />
 
 ---
 
