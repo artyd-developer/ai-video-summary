@@ -5,11 +5,18 @@
 Автоматизированная платформа обработки видео на базе **n8n + FastAPI + PostgreSQL + Whisper**.
 
 В текущем виде проект предоставляет полный pipeline для загрузки видео, извлечения аудио, транскрибации речи с помощью Whisper, сохранения статусов обработки и отправки отчётов через Telegram-бота.
-
-
-<img width="606" height="288" alt="hub1" src="https://github.com/user-attachments/assets/ee544494-b1ef-4d47-b655-1fbc55db4a44" />
-<img width="606" height="288" alt="hub2" src="https://github.com/user-attachments/assets/18d101a4-6e7b-4963-b367-afe559076a44" />
-<img width="445" height="433" alt="hub3" src="https://github.com/user-attachments/assets/48c2d5ae-6ac2-42ac-9e34-f259d562702e" />
+<table>
+  <tr>
+    <td valign="top">
+      <img src="https://github.com/user-attachments/assets/ee544494-b1ef-4d47-b655-1fbc55db4a44" width="606">
+        <br>
+      <img src="https://github.com/user-attachments/assets/18d101a4-6e7b-4963-b367-afe559076a44" width="606">
+    </td>
+    <td valign="top">
+      <img src="https://github.com/user-attachments/assets/bc25582a-e8f7-4321-9756-dd5eba5973fa" width="522">
+    </td>
+  </tr>
+</table>
 
 ---
 
